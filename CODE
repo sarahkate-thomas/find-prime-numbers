@@ -1,0 +1,146 @@
+#include <iostream>
+#include <math.h>
+using namespace std;
+
+// This program also uses user input to find the primes between 0 and the chosen number. This program will print out the prime numbers,
+// find the max prime, find the number of primes, find the average difference between the primes, and also count the number of twin
+// pairs. Lastly, this program will print the primes in order of the number in the one's place.
+
+int main() {
+   // Initializing the variables for the program
+    const int k_max_n = 10000;
+    bool is_prime[k_max_n+1];
+    int kN, i, j, i_limit, num_primes=0, primes[k_max_n+1], max_prime=0, avgDif=0;
+
+
+   // Asking for user input
+    cout << "Enter kN: " << endl;
+    cin >> kN;
+
+
+   // Initializing the array of all numbers between 0 and kN; Setting them all to true which means they're primes
+    for (i=0; i<= k_max_n; ++i) {
+        is_prime[i] = true;
+        primes[i] = i;
+    }
+    
+    
+    // Setting the numbers 0 and 1 to false because they are not prime numbers
+    is_prime[0] = false;
+    is_prime[1] = false;
+    
+    // Setting i_limit to squareroot of kN + 1 in order to capture the range
+    i_limit = sqrt(kN) + 1;
+    
+    // Iterating through nested loops in order to find which numbers are not prime; if a number is not prime the corresponding
+    // boolean value will be set to false
+    for (i = 1; i <= i_limit; i++) {
+       if (is_prime[i]) {
+          for (int x = 0; x <= kN; x++) {
+             j = pow(i,2) + (x * i);
+             is_prime[j] = false;
+          }
+       }
+    }
+    
+    // This loop prints out all the prime numbers and also sets the max prime
+    for (i = 0; i <= kN; i++) {
+       if (is_prime[i]) {
+          cout << i << " ";
+          num_primes++;
+          if (i > max_prime) {
+               max_prime = i;
+          }
+       }
+    }
+    
+    
+    // This is in order to still use primes[] later on in the program; it is avoiding the memory issue mentioned in the last part
+    primes[0] = primes[0] + 0;
+    
+    
+    // I've declared a new array for only the prime numbers
+    int realPrime[num_primes+1];
+    
+    // Initialize the new array 
+    for (i = 0; i <= num_primes; i ++) {
+       realPrime[i] = 0;
+    }
+    
+    // This loop sets the realPrime array to all the prime numbers 
+    i = 0;
+    while (i < num_primes) {
+       for (j = 0; j <= kN; j ++) {
+          if (is_prime[j]) {
+             realPrime[i] = primes[j];
+             i++;
+          }
+       }
+    }
+    
+    // Declared and initalized a new array for the differences between the prime numbers
+    int primeDif[num_primes];
+    for (i = 0; i < num_primes; i ++) {
+       primeDif[i] = 0;
+    }
+    
+    // This loop finds the differences between the prime numbers
+    for (i = num_primes-1; i > 0; i --) {
+       primeDif[i] = realPrime[i] - realPrime[i-1];
+       //cout << primeDif[i] << " ";
+    }
+      
+    // Declaring a sum variable so it is easier to find the average difference 
+    int sum = 0;
+    
+    // This loop sets the sum 
+    for (i = 0; i < num_primes; i ++) {
+       sum = sum + primeDif[i];
+       //cout << sum << endl;
+    }
+    
+    // Calculating the average difference 
+    avgDif = sum / (num_primes - 1);
+    
+    cout << endl;
+    
+    // This loop is to rearrange the numbers based on the number in the one's place 
+    int x = 0;
+    for (i = 0; i < num_primes-1; i ++) {
+       if (realPrime[i]%10 >= realPrime[i+1]%10) {
+          x = realPrime[i];
+          realPrime[i] = realPrime[i+1];
+          realPrime[i+1] = x;
+       }
+    }
+    int numTwinPrimes;
+    
+    // This is to find how many twin primes there are
+    // (2, 3) is a special case so I account for that
+    if (realPrime[2] == 5) {
+       numTwinPrimes = 1;
+    }
+    else {
+       numTwinPrimes = 0;
+    }
+    
+    // This iterates through the array of all prime numbers to look for twin primes based on the difference of 2
+    for (i = num_primes; i >= 0; i --) {
+       if ((realPrime[i] - realPrime[i - 1]) == 2) {
+          numTwinPrimes ++;
+       }
+    }
+    
+   // This prints the final values 
+    cout << "# Primes: " << num_primes << ", Max_prime: " << max_prime << endl;
+    cout << "Avg prime diff: " << avgDif << endl;
+    cout << "#Twin prime pairs: " << numTwinPrimes << endl;
+
+   // This prints the rearranged array
+    for (i = 0; i < num_primes; i ++) {
+       cout << realPrime[i] << " ";
+    }
+    
+    
+        return 0;
+}
